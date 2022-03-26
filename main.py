@@ -50,7 +50,7 @@ expected_spaces = ["749","330","935","436","376","352","710","350"]
 car_parks = ["Paul Street","North Main Street","Black Ash Park & Ride","City Hall - Eglington Street","Carrolls Quay","Grand Parade","Merchants Quay","Saint Finbarr's"]
 seconds_to_wait = 300
 insert_command = "INSERT INTO parkingSpaces  ('identifier', 'available_spaces', 'update_time', 'entry_time' ) VALUES ("
-# current_values = [["" for x in range(8)] for y in range(3)]
+current_values = [["" for x in range(3)] for y in range(8)] # 3 values per set, 8 sets
 
 
 def import_csv():
@@ -106,6 +106,7 @@ def process_csv():
     connection = sqlite3.connect("./corkCarParking.db")
     cursor = connection.cursor()
 
+    count = 0
     for row in csv_rows:
         run_time = str(datetime.datetime.now())[0:19]
         if row[0] != '_id':
@@ -115,6 +116,10 @@ def process_csv():
             data_dateString = data_dateText[0:10] + " " + data_dateText[11:19]
             insert_string = insert_command + str(carParkID) + ", " + str(available_spaces) + ", '" + data_dateString + "', '" + run_time + "');"
             cursor.execute(insert_string)
+            current_values[count - 1][0] = row[1]
+            current_values[count - 1][1] = row[4]
+            current_values[count - 1][2] = data_dateString
+        count += 1
 
     connection.commit()
     print(connection.total_changes)
@@ -128,17 +133,25 @@ def process_csv():
 def draw_window():
     appWindow = tkinter.Tk(screenName=None, baseName=None, className="Cork Car Parks", useTk=1)
     appWindow.title("Cork Car Parks")
-    appWindow.geometry("450x400")
+    appWindow.geometry("750x400")
 
-    details = Frame(appWindow)
+    topFrame = Frame(appWindow)
+    label = Label(topFrame, text="Car Park", width=25, height=2, anchor=W).grid(row=0, column=0)
+    label = Label(topFrame, text="Available Spaces", width=25, height=2, anchor=W).grid(row=0, column=1)
+    label = Label(topFrame, text="Updated at", width=25, height=2, anchor=W).grid(row=0, column=2)
+
     count = 0
     for car_park in car_parks:
-        label = Label(details, text=car_park, width = 25, height = 2 ).grid(row = count, column = 0, sticky=tkinter.W)
+        label = Label(topFrame, text=car_park, width=25, height=2, anchor=W).grid(row=count + 1, column=0)
         count += 1
-    count = 0
-    for spaces in expected_spaces:
-        label = Label(details, text=spaces, width=5, height=2).grid(row=count, column=1, sticky=tkinter.W)
-        count += 1
+
+    def update_details():
+        # clock_label = Label(topFrame, text=time.strftime('%H:%M:%S'), width=10, height=2).grid(row=0, column=3)
+        process_csv()
+        for parks in range(8):
+            label = Label(topFrame, text=current_values[parks][1], width=5, height=2).grid(row=parks + 1, column=1)
+            label = Label(topFrame, text=current_values[parks][2], width=25, height=2).grid(row=parks + 1, column=2)
+        topFrame.after(60000, update_details)
 
 
     buttons = Frame(appWindow)
@@ -146,29 +159,17 @@ def draw_window():
     interval_button = Button(buttons, text="Update at intervals", width=15, height=2).grid(row=1, column =10)
     exit_button = Button(buttons, text= "Exit", width=10, height=2 , command=sys.exit).grid(row=1, column =20)
 
-    details.grid(row=1, column=1)
-    buttons.grid(row=30, column=1)
+    topFrame.grid(row = 0, column = 0)
+    buttons.grid(row=30, column=0)
 
-    # checkNow_button.grid(row=1, column =1)
-    # interval_button.grid(row=1, column =10)
-    # exit_button.grid(row=1, column =20)
-
-    # ent = Entry(numberEntry, width=5, justify=tkinter.CENTER)
-    # ent.grid(row=rowPos, column=colPos)
-    # # combining previous 2 lines into single line (ie ent=Entry().grid()) causes error - not added to entries array
-    # entries.append(ent)
-    # # print("x: ",x ,"row: ", rowPos," y: ",y, "Col: ", colPos)
-    #
-    # btn = Button(numberEntry, text="Solve", width=10, height=5, command=get_numbers)
-    # btn.place(x=170, y=275)
+    update_details()
 
     appWindow.mainloop()
 
+
 def main():
+    process_csv()
     draw_window()
-    while True:
-        process_csv()
-        time.sleep(seconds_to_wait)
 
 
 main()
