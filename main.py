@@ -19,7 +19,6 @@ Could use it to show trends? Filling up, emptying out? Steady if change in last 
 
 """
 
-
 # Imports
 import datetime
 import sys
@@ -32,7 +31,6 @@ import tkinter
 import tkinter.messagebox
 from tkinter import *
 
-
 # Values to check against
 expected_headings = ['_id', 'identifier', 'name', 'spaces', 'free_spaces', 'opening_times', 'notes', 'latitude',
                      'longitude', 'date', 'price', 'height_restrictions']
@@ -44,13 +42,15 @@ expected_opening = ["Monday - Saturday 07.30 -00.00, Sunday 11.30 - 00.00",
 expected_cost = ["€2.30 per hour; Flat rate €3.50 from 18.30-24.00", "€1.70 per hour; Flat rate €2.00 from 18.30-21.30",
                  "€5 per day", "€2.90 per hour, max. €13 per day", "€2.80 per hour", "€3 per hour", "€3 per hour",
                  "€2.80 per hour"]
-expected_spaces = ["749","330","935","436","376","352","710","350"]
+expected_spaces = ["749", "330", "935", "436", "376", "352", "710", "350"]
 
 # Constants
-car_parks = ["Paul Street","North Main Street","Black Ash Park & Ride","City Hall - Eglington Street","Carrolls Quay","Grand Parade","Merchants Quay","Saint Finbarr's"]
+car_parks = ["Paul Street", "North Main Street", "Black Ash Park & Ride", "City Hall - Eglington Street",
+             "Carrolls Quay", "Grand Parade", "Merchants Quay", "Saint Finbarr's"]
 seconds_to_wait = 300
+milliseconds_to_wait = seconds_to_wait * 1000
 insert_command = "INSERT INTO parkingSpaces  ('identifier', 'available_spaces', 'update_time', 'entry_time' ) VALUES ("
-current_values = [["" for x in range(3)] for y in range(8)] # 3 values per set, 8 sets
+current_values = [["" for x in range(3)] for y in range(8)]  # 3 values per set, 8 sets
 
 
 def check_tables():
@@ -127,7 +127,7 @@ def check_csv_file(csv_rows):
             if row[10] != expected_cost[count - 1]:
                 print(row[2], "cost has changed", sep=" ")
             if row[3] != expected_spaces[count - 1]:
-                print(row[3], expected_spaces[count-1])
+                print(row[3], expected_spaces[count - 1])
                 print(row[2], "total number of spaces has changed", sep=" ")
         count += 1
 
@@ -151,7 +151,8 @@ def process_csv():
             available_spaces = int(row[4])
             data_dateText = row[9]
             data_dateString = data_dateText[0:10] + " " + data_dateText[11:19]
-            insert_string = insert_command + str(carParkID) + ", " + str(available_spaces) + ", '" + data_dateString + "', '" + run_time + "');"
+            insert_string = insert_command + str(carParkID) + ", " + str(
+                available_spaces) + ", '" + data_dateString + "', '" + run_time + "');"
             cursor.execute(insert_string)
             current_values[count - 1][0] = row[1]
             current_values[count - 1][1] = row[4]
@@ -194,29 +195,24 @@ def draw_window():
         for parks in range(8):
             label = Label(topFrame, text=current_values[parks][1], width=5, height=2).grid(row=parks + 1, column=1)
             label = Label(topFrame, text=current_values[parks][2], width=25, height=2).grid(row=parks + 1, column=2)
-        topFrame.after(60000, update_details)
-
+        topFrame.after(milliseconds_to_wait, update_details)
 
     buttons = Frame(appWindow)
-    checkNow_button = Button(buttons, text="Update Now", width = 10, height = 2).grid(row=1, column =1)
-    interval_button = Button(buttons, text="Update at intervals", width=15, height=2).grid(row=1, column =10)
-    exit_button = Button(buttons, text= "Exit", width=10, height=2 , command=sys.exit).grid(row=1, column =20)
+    checkNow_button = Button(buttons, text="Update Now", width=10, height=2).grid(row=1, column=1)
+    interval_button = Button(buttons, text="Update at intervals", width=15, height=2).grid(row=1, column=10)
+    exit_button = Button(buttons, text="Exit", width=10, height=2, command=sys.exit).grid(row=1, column=20)
 
-    topFrame.grid(row = 0, column = 0)
+    topFrame.grid(row=0, column=0)
     buttons.grid(row=30, column=0)
 
     update_details()
-
     appWindow.mainloop()
 
 
 def main():
-    # check_tables()
+    check_tables()
     process_csv()
     draw_window()
 
 
 main()
-
-
-
