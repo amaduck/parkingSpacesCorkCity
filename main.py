@@ -1,4 +1,4 @@
-# App to show how many spaces free in city car parks - ideally updates regularly
+# App to show how many spaces free in city car parks
 
 # Based on this data:
 # https://data.gov.ie/dataset/parking/resource/6cc1028e-7388-4bc5-95b7-667a59aa76dc
@@ -6,18 +6,6 @@
 # CSV file gives following data:
 # _id	identifier	name	spaces	free_spaces	opening_times	notes	latitude	longitude	date	price	height_restrictions
 
-"""
-To do
-
-Make GUI
-Add check for price change - display pop-up
-Add check for opening hours change - display pop-up
-Add not updating warning if update_time old
-
-Is a database really necessary? - over a long period it would allow you to idenfity busy times?
-Could use it to show trends? Filling up, emptying out? Steady if change in last 3 calls within +/-5, etc
-
-"""
 
 # Imports
 import datetime
@@ -133,7 +121,6 @@ def check_csv_file(csv_rows):
                     all_good = False
                     message = message + "Headings don't match"
         else:
-            # print(row[1], expected_ids[count - 1])
             if row[1] != expected_ids[count - 1]:
                 all_good = False
                 message = message + "\nIDs don't match"
