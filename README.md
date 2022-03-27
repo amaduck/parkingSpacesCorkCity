@@ -10,6 +10,8 @@ The application uses a dataset from data.corkcity.ie to show how many available 
 
 In reality this would be more useful as a mobile app, but the purpose is to get better with python
 
+A database isn't really necessary for this - adding one mainly for the experience. Should allow addition of trends (filling, emptying, steady)
+
 Currently:
 - App checks if database tables exists, creates them if not
 - Pulls the current data CSV from the url http://data.corkcity.ie/datastore/dump/6cc1028e-7388-4bc5-95b7-667a59aa76dc. Exits if it can't access
