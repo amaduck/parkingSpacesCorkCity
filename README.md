@@ -23,7 +23,7 @@ Currently:
 # Issue with daylight savings time
 The CSV files come with a datetime value for the data - we rolled into summer time last night, but only one of the times has definitely updated (Black Ash), and one potentially (Merchant's Quay). The others are still on old time - need to consider how to handle. Presumably other times will update during the week
 
-Goals:
+# Goals:
 1) Currently updates every x seconds, interval hardcoded - want to provide option to set interval in GUI, and preserve it across runs
 2) Want to provide the option to only update when clicked on either
 3) Improve GUI
