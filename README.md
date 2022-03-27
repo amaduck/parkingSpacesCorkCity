@@ -16,7 +16,7 @@ Currently:
 - App checks if database tables exists, creates them if not
 - Pulls the current data CSV from the url http://data.corkcity.ie/datastore/dump/6cc1028e-7388-4bc5-95b7-667a59aa76dc. Exits if it can't access
 - Checks the CSV file has the expected format and info
-- Added pop up warnings if stored car park data (price, opening hours, height restriction) changes
+- Added pop up warnings if stored car park data (price, opening hours, total spaces) changes
 - Populates a GUI screen with available spaces, and time of data
 - Checks whether or not car park is currently open, displays on GUI
 - Updates every 5 minutes (hardcoded value)
