@@ -50,10 +50,25 @@ car_parks = ["Paul Street", "North Main Street", "Black Ash Park & Ride", "City 
 seconds_to_wait = 300
 milliseconds_to_wait = seconds_to_wait * 1000
 insert_command = "INSERT INTO parkingSpaces  ('identifier', 'available_spaces', 'update_time', 'entry_time' ) VALUES ("
+day_names = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
 current_values = [["" for x in range(3)] for y in range(8)]  # 3 values per set, 8 sets
+
+# TKInter elements
+# Putting these outside functions so they can be accessed by all
+appWindow = tkinter.Tk(screenName=None, baseName=None, className="Cork Car Parks", useTk=1)
+appWindow.title("Cork Car Parks")
+appWindow.geometry("600x400")
+topFrame = Frame(appWindow)
+buttons = Frame(appWindow)
+topFrame.grid(row=0, column=0)
+buttons.grid(row=30, column=0)
 
 
 def check_tables():
+    # connecting to database will create it if it doesn't exist
+    # tables in db checked, and if not found, created by importing .sql script
+    # Could also hardcode commands for table creation
+    # In a system where people could edit the .sql, be a risk of executing malicious code
     db = sqlite3.connect('./corkCarParking.db')
     cursor = db.cursor()
 
@@ -94,6 +109,7 @@ def import_csv():
         CSV_data = urllib.request.urlopen(url)
     except:
         print("Can't access data source - check internet connection")
+        tkinter.messagebox.showinfo("Error","Can't access data source - check internet connection")
         sys.exit()
     else:
         lines = [line.decode('utf-8') for line in CSV_data.readlines()]
@@ -172,38 +188,73 @@ def check_open():
     # Check if the car park is currently open
     # Either: Closed, open, closing within an hour
     day_today = datetime.datetime.now().isoweekday()
+    day_name = day_names[day_today - 1]
+    now_time = datetime.datetime.now().time()
+
+    connection = sqlite3.connect("./corkCarParking.db")
+    cursor = connection.cursor()
+    for car_parks in range(8):
+        req_opens_today = "Select " + day_name + "_Open from carPark_details where id = " + str(car_parks + 1)
+        req_closes_today = "Select " + day_name + "_Close from carPark_details where id = " + str(car_parks + 1)
+        opens_today = cursor.execute(req_opens_today).fetchone()[0]
+        closes_today = cursor.execute(req_closes_today).fetchone()[0]
+        open_now = ""
+        if opens_today == "Always":
+            open_now = "Open"
+        elif opens_today == "Closed":
+            open_now = "Closed"
+        else:
+            try:
+                open_time = datetime.datetime.strptime(opens_today, '%H:%M:%S').time()
+                close_time = datetime.datetime.strptime(closes_today, '%H:%M:%S').time()
+                if open_time < now_time and close_time > now_time:
+                    open_now = "Open"
+                    time_until_close = datetime.datetime.combine(datetime.date.today(), close_time) - datetime.datetime.now()
+                    if time_until_close.seconds < 3600:
+                        open_now = "Closing Soon"
+                else:
+                    open_now="Closed"
+            except:
+                print("Unexpected time format")
+
+        if open_now == "Open":
+            bgColour = "#22f75e"
+        elif open_now == "Closing Soon":
+            bgColour = "#f78c22"
+        else:
+            bgColour = "Red"
+
+        label = Label(topFrame, text=open_now, bg = bgColour, width=12, height=2).grid(row=car_parks+1, column=2)
+
+    connection.close()
 
 
 def draw_window():
-    appWindow = tkinter.Tk(screenName=None, baseName=None, className="Cork Car Parks", useTk=1)
-    appWindow.title("Cork Car Parks")
-    appWindow.geometry("750x400")
+    label = Label(topFrame, text="Car Park", width=23, height=2, anchor=W, relief=SUNKEN).grid(row=0, column=0)
+    label = Label(topFrame, text="Available Spaces", width=15, height=2, relief=SUNKEN).grid(row=0, column=1)
+    label = Label(topFrame, text="Open", width=12, height=2, relief=SUNKEN).grid(row=0, column=2)
+    label = Label(topFrame, text="Updated at", width=18, height=2).grid(row=0, column=3)
 
-    topFrame = Frame(appWindow)
-    label = Label(topFrame, text="Car Park", width=25, height=2, anchor=W).grid(row=0, column=0)
-    label = Label(topFrame, text="Available Spaces", width=25, height=2, anchor=W).grid(row=0, column=1)
-    label = Label(topFrame, text="Updated at", width=25, height=2, anchor=W).grid(row=0, column=2)
 
     count = 0
     for car_park in car_parks:
-        label = Label(topFrame, text=car_park, width=25, height=2, anchor=W).grid(row=count + 1, column=0)
+        label = Label(topFrame, text=car_park, width=23, height=2, anchor=W, relief=SUNKEN).grid(row=count + 1, column=0)
         count += 1
 
     def update_details():
         # clock_label = Label(topFrame, text=time.strftime('%H:%M:%S'), width=10, height=2).grid(row=0, column=3)
         process_csv()
+        check_open()
         for parks in range(8):
-            label = Label(topFrame, text=current_values[parks][1], width=5, height=2).grid(row=parks + 1, column=1)
-            label = Label(topFrame, text=current_values[parks][2], width=25, height=2).grid(row=parks + 1, column=2)
+            label = Label(topFrame, text=current_values[parks][1], width=15, height=2, relief=SUNKEN).grid(row=parks + 1, column=1)
+            label = Label(topFrame, text=current_values[parks][2], width=18, height=2, relief=SUNKEN).grid(row=parks + 1, column=3)
+        # If I put the next command after an if(ms > 0):, it should run once
         topFrame.after(milliseconds_to_wait, update_details)
 
-    buttons = Frame(appWindow)
+
     checkNow_button = Button(buttons, text="Update Now", width=10, height=2).grid(row=1, column=1)
     interval_button = Button(buttons, text="Update at intervals", width=15, height=2).grid(row=1, column=10)
     exit_button = Button(buttons, text="Exit", width=10, height=2, command=sys.exit).grid(row=1, column=20)
-
-    topFrame.grid(row=0, column=0)
-    buttons.grid(row=30, column=0)
 
     update_details()
     appWindow.mainloop()
