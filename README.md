@@ -11,10 +11,10 @@ The application uses a dataset from data.corkcity.ie to show how many available 
 In reality this would be more useful as a mobile app, but the purpose is to get better with python
 
 Currently:
-App checks if database tables exists, creates them if not
-Pulls the current data CSV from the url http://data.corkcity.ie/datastore/dump/6cc1028e-7388-4bc5-95b7-667a59aa76dc. Exits if it can't access
-Populates a GUI screen with available spaces, and time of data
-Updates every 5 minutes (hardcoded value)
+- App checks if database tables exists, creates them if not
+- Pulls the current data CSV from the url http://data.corkcity.ie/datastore/dump/6cc1028e-7388-4bc5-95b7-667a59aa76dc. Exits if it can't access
+- Populates a GUI screen with available spaces, and time of data
+- Updates every 5 minutes (hardcoded value)
 
 Goals:
 1) Currently updates every x seconds, interval hardcoded - want to provide option to set interval in GUI, and preserve it across runs
