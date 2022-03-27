@@ -139,12 +139,17 @@ def check_csv_file(csv_rows):
                 message = message + "\nIDs don't match"
             # Checks for changes to rates, total spaces, opening hours:
             if row[5] != expected_opening[count - 1]:
-                print(row[2], "opening hours have changed", sep=" ")
+                error_msg = row[2] + " opening hours have changed"
+                print(error_msg)
+                tkinter.messagebox.showinfo("!", error_msg)
             if row[10] != expected_cost[count - 1]:
-                print(row[2], "cost has changed", sep=" ")
+                error_msg = row[2] + " cost has changed"
+                print(error_msg)
+                tkinter.messagebox.showinfo("!", error_msg)
             if row[3] != expected_spaces[count - 1]:
-                print(row[3], expected_spaces[count - 1])
-                print(row[2], "total number of spaces has changed", sep=" ")
+                error_msg = row[2] + " total number of spaces has changed"
+                print(error_msg)
+                tkinter.messagebox.showinfo("!", error_msg)
         count += 1
 
     if count > 9:
