@@ -15,14 +15,14 @@ Currently:
 - Pulls the current data CSV from the url http://data.corkcity.ie/datastore/dump/6cc1028e-7388-4bc5-95b7-667a59aa76dc. Exits if it can't access
 - Populates a GUI screen with available spaces, and time of data
 - Updates every 5 minutes (hardcoded value)
+- Checks whether or not car park is currently open, displays on GUI
 
 Goals:
 1) Currently updates every x seconds, interval hardcoded - want to provide option to set interval in GUI, and preserve it across runs
 2) Want to provide the option to only update when clicked on either
-3) Add a check for whether car park currently open - display this on GUI
-4) Add pop up warnings if stored car park data (price, opening hours, height restriction) changes
-5) Improve GUI
-6) Add percentage - 66% full, etc
-7) Add a trend - filling up, emptying out
-8) Change Updated at to eg updated 5 mins ago, 10 mins ago, 1 hour ago, ( >12 hours add a warning, stale data)
+3) Add pop up warnings if stored car park data (price, opening hours, height restriction) changes
+4) Improve GUI
+5) Add percentage - 66% full, etc
+6) Add a trend - filling up, emptying out
+7) Change Updated at to eg updated 5 mins ago, 10 mins ago, 1 hour ago, ( >12 hours add a warning, stale data)
 
