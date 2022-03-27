@@ -53,20 +53,57 @@ insert_command = "INSERT INTO parkingSpaces  ('identifier', 'available_spaces', 
 current_values = [["" for x in range(3)] for y in range(8)] # 3 values per set, 8 sets
 
 
+def check_tables():
+    db = sqlite3.connect('./corkCarParking.db')
+    cursor = db.cursor()
+
+    carPark_details_Found = False
+    parkingSpaces_Found = False
+
+    for row in cursor.execute("SELECT name FROM sqlite_master WHERE type='table'"):
+        row = row[0]
+        if row == "parkingSpaces":
+            print("parkingSpaces table exists")
+            parkingSpaces_Found = True
+        if row == "carPark_details":
+            print("carPark_details table exists")
+            carPark_details_Found = True
+
+    if not carPark_details_Found:
+        with open('create_carparkDetails.sql', 'r') as sql_file:
+            print("creating and populating carPark_details table")
+            sql_script = sql_file.read()
+            cursor.executescript(sql_script)
+
+    if not parkingSpaces_Found:
+        with open('create_parkingSpaces.sql', 'r') as sql_file:
+            print("creating parkingSpaces table")
+            sql_script = sql_file.read()
+            cursor.executescript(sql_script)
+
+    db.commit()
+    db.close()
+
+
 def import_csv():
     # Pulls the CSV output from url mentioned
     # Calls check_csv_file to verify column headings, car park IDs, and number of car parks
     # If all in order, returns the csv data
     url = 'http://data.corkcity.ie/datastore/dump/6cc1028e-7388-4bc5-95b7-667a59aa76dc'
-    CSV_data = urllib.request.urlopen(url)
-    lines = [line.decode('utf-8') for line in CSV_data.readlines()]
-    csv_rows = csv.reader(lines)
-
-    if check_csv_file(csv.reader(lines))[0] != True:
-        print("Oh shit")
-        print(check_csv_file(csv.reader(lines))[1])
+    try:
+        CSV_data = urllib.request.urlopen(url)
+    except:
+        print("Can't access data source - check internet connection")
+        sys.exit()
     else:
-        return csv_rows
+        lines = [line.decode('utf-8') for line in CSV_data.readlines()]
+        csv_rows = csv.reader(lines)
+
+        if check_csv_file(csv.reader(lines))[0] != True:
+            print("Oh shit")
+            print(check_csv_file(csv.reader(lines))[1])
+        else:
+            return csv_rows
 
 
 def check_csv_file(csv_rows):
@@ -130,6 +167,12 @@ def process_csv():
             print(rows)
 
 
+def check_open():
+    # Check if the car park is currently open
+    # Either: Closed, open, closing within an hour
+    day_today = datetime.datetime.now().isoweekday()
+
+
 def draw_window():
     appWindow = tkinter.Tk(screenName=None, baseName=None, className="Cork Car Parks", useTk=1)
     appWindow.title("Cork Car Parks")
@@ -168,6 +211,7 @@ def draw_window():
 
 
 def main():
+    # check_tables()
     process_csv()
     draw_window()
 
