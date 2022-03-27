@@ -262,7 +262,6 @@ def draw_window():
 
 def main():
     check_tables()
-    process_csv()
     draw_window()
 
 
