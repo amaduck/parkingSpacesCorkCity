@@ -1,6 +1,8 @@
 # parkingSpacesCorkCity
 app to show spaces available in Cork City car parks
 
+* Link to data has changed, format seems the same, but change doesn't seem to be complete - no update since yesterday - need to update when complete
+
 This is developed with three python learning goals in mind:
 1) Pulling data from internet sources
 2) Executing sqlite commands from code
@@ -23,7 +25,7 @@ Currently:
 
 
 # Issue with daylight savings time
-The CSV files come with a datetime value for the data - we rolled into summer time last night, but only one of the times has definitely updated (Black Ash), and one potentially (Merchant's Quay). The others are still on old time - need to consider how to handle. Presumably other times will update during the week
+The CSV files come with a datetime value for the data - we rolled into summer time last night, but only one of the times has definitely updated (Black Ash), and one potentially (Merchant's Quay). The others are still on old time - need to consider how to handle. Presumably other times will update during the week. Will affect "updated at" - an update could be from 5 mins ago, but showing as 1:05 ago
 
 # Goals:
 1) Currently updates every x seconds, interval hardcoded - want to provide option to set interval in GUI, and preserve it across runs
